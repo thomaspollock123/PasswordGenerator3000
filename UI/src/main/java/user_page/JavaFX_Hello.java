@@ -20,8 +20,8 @@ public class JavaFX_Hello extends Application {
             stage.setTitle("This is a Test VBox");
 
             // Create VBox for each corner
-            VBox Top = createVBox(10, "TOP_LEFT", "Password Input", "Press me :D");
-            VBox Bottom = createVBox(10, "BOTTOM_LEFT", "Password Generator", "Enter");
+            VBox Top = createVBox(10, "TOP_LEFT", "Password Input", "Press me :D", "Enter");
+            VBox Bottom = createVBox(10, "BOTTOM_LEFT", "Password Generator", "Generate", "Enter");
             TableView right = new TableView();
 
             // Create a GridPane and place VBoxes in four corners
@@ -45,12 +45,13 @@ public class JavaFX_Hello extends Application {
     }
 
     // Helper method to create a VBox
-    private VBox createVBox(int size, String position, String lab, String but) {
+    private VBox createVBox(int size, String position, String lab, String but1, String but2) {
         VBox vbox = new VBox(size);
         Label l = new Label(lab);
-        Button b = new Button(but);
+        Button b1 = new Button(but1);
+        Button b2 = new Button(but2);
         TextField t = new TextField();
-        vbox.getChildren().addAll(l, t, b);
+        vbox.getChildren().addAll(l, t, b1, b2);
         vbox.setAlignment(Pos.valueOf(position.toUpperCase()));
         return vbox;
     }
