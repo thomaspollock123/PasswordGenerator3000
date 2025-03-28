@@ -32,33 +32,69 @@ public class CRUD extends InitializeDatabase {
         }
     }
 
-    public String Create() {
-        return "INSERT INTO Passwords(Owner, password) VALUES(?, ?)";
-    }
+    private String Read() {
+        String selectSQL = "SELECT id, Owner, password FROM Passwords";
+        StringBuilder output = new StringBuilder();
 
-    public String Read() {
-        return "SELECT id, Owner, password FROM Passwords";
+        try (Connection conn = DriverManager.getConnection(JDBC + db_path);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(selectSQL)) {
+
+            while (rs.next()) {
+                String row = String.format("%-5s%-25s%-10s%n",
+                        rs.getInt("id"), rs.getString("Owner"), rs.getString("password"));
+                output.append(row);
+            }
+        } catch (SQLException e) {
+            System.out.println("Database error: " + e.getMessage());
+        }
+        return output.toString();
     }
 
     public String Update() {
         return "UPDATE Passwords SET Owner = ? , " + "password = ? " + "WHERE id = ?";
     }
 
-    public String Delete() {
-        return "DELETE FROM Passwords WHERE id = ?";
+    public static void Delete(String owner) {
+        String deleteSQL = "DELETE FROM Passwords WHERE Owner = ?";
+
+        try (Connection conn = DriverManager.getConnection(JDBC + db_path);
+             PreparedStatement pstmt = conn.prepareStatement(deleteSQL)) {
+
+            // Set the parameters for the prepared statement
+            pstmt.setString(1, owner);
+
+            int rowsAffected = pstmt.executeUpdate();
+
+            if (rowsAffected == 0) {
+                System.out.println("Owner " + owner + " not found");
+            } else {
+                System.out.println("Password deleted successfully!");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Database error: " + e.getMessage());
+        }
     }
 
     public static void main(String[] args) {
         DatabaseSetUp();
+        // Delete test
+        System.out.println("Enter Password to Delete: ");
+        String owner_delete = input.nextLine();
+        Delete(owner_delete);
+
+        // Insert test
         System.out.println("Enter Owner Name: ");
         String owner = input.nextLine();
-
         System.out.print("Enter Password: ");
         String password = input.nextLine();
-
         // Use prepared statement to safely insert user input into the database
         insertPassword(owner, password);
 
         input.close();
+        // Select test
+        CRUD read_instance = new CRUD();
+        System.out.println(read_instance.Read());
     }
 }
