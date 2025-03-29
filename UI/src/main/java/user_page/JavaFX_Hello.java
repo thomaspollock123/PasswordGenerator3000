@@ -1,6 +1,8 @@
 package user_page;
 
+import com.sun.org.slf4j.internal.LoggerFactory;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -11,6 +13,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.scene.input.MouseEvent;
 
 public class JavaFX_Hello extends Application {
 
@@ -53,6 +56,12 @@ public class JavaFX_Hello extends Application {
         TextField t = new TextField();
         vbox.getChildren().addAll(l, t, b1, b2);
         vbox.setAlignment(Pos.valueOf(position.toUpperCase()));
+        b2.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+
+            public void handle(MouseEvent event) {
+                t.setText("hello :D");
+            }
+        });
         return vbox;
     }
 
