@@ -1,6 +1,5 @@
 package user_page;
 
-import com.sun.org.slf4j.internal.LoggerFactory;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -17,6 +16,7 @@ import javafx.scene.input.MouseEvent;
 
 public class JavaFX_Hello extends Application {
 
+    PassGen pg = new PassGen();
     @Override
     public void start(Stage stage) {
         try {
@@ -56,10 +56,10 @@ public class JavaFX_Hello extends Application {
         TextField t = new TextField();
         vbox.getChildren().addAll(l, t, b1, b2);
         vbox.setAlignment(Pos.valueOf(position.toUpperCase()));
-        b2.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+        b1.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 
             public void handle(MouseEvent event) {
-                t.setText("hello :D");
+                t.setText(pg.GeneratePassword());
             }
         });
         return vbox;
