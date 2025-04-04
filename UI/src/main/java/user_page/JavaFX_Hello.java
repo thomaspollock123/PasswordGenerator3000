@@ -1,15 +1,14 @@
 package user_page;
 
+import database.CRUD;
+import database.PasswordObject;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.geometry.HPos;
-import javafx.geometry.VPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.input.MouseEvent;
@@ -17,6 +16,7 @@ import javafx.scene.input.MouseEvent;
 public class JavaFX_Hello extends Application {
 
     PassGen pg = new PassGen();
+
     @Override
     public void start(Stage stage) {
         try {
@@ -25,7 +25,15 @@ public class JavaFX_Hello extends Application {
             // Create VBox for each corner
             VBox Top = createVBox(10, "TOP_LEFT", "Password Input", "Press me :D", "Enter");
             VBox Bottom = createVBox(10, "BOTTOM_LEFT", "Password Generator", "Generate", "Enter");
-            TableView right = new TableView();
+
+            TableView<PasswordObject> right = new TableView<PasswordObject>();
+            TableColumn<PasswordObject, String> column1 = new TableColumn<PasswordObject, String>("owner");
+            column1.setCellValueFactory(new PropertyValueFactory<PasswordObject, String>("owner"));
+            TableColumn<PasswordObject, String> column2 = new TableColumn<PasswordObject, String>("password");
+            column2.setCellValueFactory(new PropertyValueFactory<PasswordObject, String>("password"));
+
+            right.getColumns().add(column1);
+            right.getColumns().add(column2);
 
             // Create a GridPane and place VBoxes in four corners
             GridPane grid = new GridPane();
@@ -57,6 +65,12 @@ public class JavaFX_Hello extends Application {
         vbox.getChildren().addAll(l, t, b1, b2);
         vbox.setAlignment(Pos.valueOf(position.toUpperCase()));
         b1.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+
+            public void handle(MouseEvent event) {
+                t.setText(pg.GeneratePassword());
+            }
+        });
+        b2.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 
             public void handle(MouseEvent event) {
                 t.setText(pg.GeneratePassword());
