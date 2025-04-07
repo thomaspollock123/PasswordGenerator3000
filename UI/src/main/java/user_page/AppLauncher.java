@@ -6,6 +6,7 @@ public class AppLauncher {
 
     public static void main(String[] args) {
         InitializeDatabase.DatabaseSetUp();
+        // System.out.println(ClassLoader.getSystemResource("Database/PasswordObject.class"));
         JavaFX_Hello.main(args);
     }
 }

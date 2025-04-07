@@ -1,5 +1,6 @@
 package database;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.File;
@@ -13,9 +14,11 @@ public class CRUD extends InitializeDatabase {
 
     private static final String JDBC = "jdbc:sqlite:";
 
+    PasswordObject passwordObject = new PasswordObject();
+
     static Scanner input = new Scanner(System.in);
 
-    private static void insertPassword(String owner, String password) {
+    public void insertPassword(String owner, String password) {
         String insertSQL = "INSERT INTO Passwords(Owner, password) VALUES(?, ?)";
 
         try (Connection conn = DriverManager.getConnection(JDBC + db_path);
@@ -24,7 +27,6 @@ public class CRUD extends InitializeDatabase {
             // Set the parameters for the prepared statement
             pstmt.setString(1, owner);
             pstmt.setString(2, password);
-
             pstmt.executeUpdate();
 
             System.out.println("Password inserted successfully!");
@@ -79,6 +81,26 @@ public class CRUD extends InitializeDatabase {
         }
     }
 
+    public ObservableList<PasswordObject> getAllPasswords() {
+        ObservableList<PasswordObject> data = FXCollections.observableArrayList();
+        String selectSQL = "SELECT id, Owner, password FROM Passwords";
+
+        try (Connection conn = DriverManager.getConnection(JDBC + db_path);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(selectSQL)) {
+
+            while (rs.next()) {
+                PasswordObject entry = new PasswordObject(
+                        rs.getString("Owner"), rs.getString("password")
+                );
+                data.add(entry);
+            }
+        } catch (SQLException e) {
+            System.out.println("Database error: " + e.getMessage());
+        }
+        return data;
+    }
+
     public static void main(String[] args) {
         DatabaseSetUp();
         // Delete test
@@ -92,7 +114,6 @@ public class CRUD extends InitializeDatabase {
         System.out.print("Enter Password: ");
         String password = input.nextLine();
         // Use prepared statement to safely insert user input into the database
-        insertPassword(owner, password);
 
         input.close();
         // Select test
