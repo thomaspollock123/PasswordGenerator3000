@@ -1,21 +1,26 @@
 package user_page;
 
-import database.CRUD;
-import database.PasswordObject;
+import database.*;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.*;
-import javafx.stage.Stage;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class JavaFX_Hello extends Application {
 
+    CRUD crud = new CRUD();
     PassGen pg = new PassGen();
+    PasswordObject passwordObject = new PasswordObject();
+    private final ObservableList<PasswordObject> passwordData = FXCollections.observableArrayList();
 
     @Override
     public void start(Stage stage) {
@@ -34,6 +39,8 @@ public class JavaFX_Hello extends Application {
 
             right.getColumns().add(column1);
             right.getColumns().add(column2);
+            passwordData.setAll(crud.getAllPasswords());
+            right.setItems(passwordData);
 
             // Create a GridPane and place VBoxes in four corners
             GridPane grid = new GridPane();
@@ -61,19 +68,29 @@ public class JavaFX_Hello extends Application {
         Label l = new Label(lab);
         Button b1 = new Button(but1);
         Button b2 = new Button(but2);
-        TextField t = new TextField();
-        vbox.getChildren().addAll(l, t, b1, b2);
+        TextField t1 = new TextField();
+        TextField t2 = new TextField();
+        t1.setPromptText("Enter Name");
+        t2.setPromptText("Enter Password");
+        vbox.getChildren().addAll(l, t1, t2, b1, b2);
         vbox.setAlignment(Pos.valueOf(position.toUpperCase()));
         b1.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 
             public void handle(MouseEvent event) {
-                t.setText(pg.GeneratePassword());
+                t2.setText(pg.GeneratePassword());
             }
         });
         b2.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 
             public void handle(MouseEvent event) {
-                t.setText(pg.GeneratePassword());
+                String owner = t1.getText();
+                String password = t2.getText();
+                if (!owner.isEmpty() && !password.isEmpty()) {
+                    crud.insertPassword(owner, password);
+                    t1.clear();
+                    t2.clear();
+                    passwordData.setAll(crud.getAllPasswords());
+                }
             }
         });
         return vbox;
