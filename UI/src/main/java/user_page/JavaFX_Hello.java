@@ -1,21 +1,24 @@
 package user_page;
 
 import database.*;
+import utility.*;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.beans.binding.Bindings;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Slider;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import utility.PassGen;
 
 public class JavaFX_Hello extends Application {
 
@@ -39,8 +42,10 @@ public class JavaFX_Hello extends Application {
             TableView<PasswordObject> right = new TableView<PasswordObject>();
             TableColumn<PasswordObject, String> column1 = new TableColumn<PasswordObject, String>("owner");
             column1.setCellValueFactory(new PropertyValueFactory<PasswordObject, String>("owner"));
+            column1.setText("Name");
             TableColumn<PasswordObject, String> column2 = new TableColumn<PasswordObject, String>("password");
             column2.setCellValueFactory(new PropertyValueFactory<PasswordObject, String>("password"));
+            column2.setText("Password");
 
             right.getColumns().add(column1);
             right.getColumns().add(column2);
@@ -141,16 +146,48 @@ public class JavaFX_Hello extends Application {
 
     private VBox createPasswordGenerator(TextField t1) {
         VBox vbox = new VBox(10);
+        HBox hboxLabel = new HBox();
+        HBox hboxCheckBox1 = new HBox();
+        HBox hboxCheckBox2 = new HBox();
+
+        Region spacer1 = new Region();
+        HBox.setHgrow(spacer1, Priority.ALWAYS);
+        Region spacer2 = new Region();
+        HBox.setHgrow(spacer2, Priority.ALWAYS);
+        Region spacer3 = new Region();
+        HBox.setHgrow(spacer3, Priority.ALWAYS);
+
         String position = "TOP_LEFT";
+        Slider slider = new Slider(4, 30, 1);
+        slider.setBlockIncrement(1);
+        slider.setMajorTickUnit(1);
+        slider.setMinorTickCount(0);
+        slider.setSnapToTicks(true);
+        Label sliderLabel = new Label();
+
+        CheckBox letters = new CheckBox("Letters");
+        letters.setSelected(true);
+        CheckBox numbers = new CheckBox("Numbers");
+        numbers.setSelected(true);
+        CheckBox capitals = new CheckBox("Capitals");
+        capitals.setSelected(true);
+        CheckBox special = new CheckBox("Special");
+        special.setSelected(false);
+        special.setStyle("-fx-padding: 0 12 0 0;");
+
+        sliderLabel.textProperty().bind(Bindings.format("%.0f", slider.valueProperty()));
         Button b1 = new Button("Generate Password");
         Label l = new Label("Password Generator");
         b1.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 
             public void handle(MouseEvent event) {
-                t1.setText(pg.GeneratePassword());
+                t1.setText(pg.GeneratePassword(letters.isSelected(), capitals.isSelected(), numbers.isSelected(), special.isSelected(), (int) slider.getValue()));
             }
         });
-        vbox.getChildren().addAll(l, b1);
+        hboxLabel.getChildren().addAll(l, spacer1, sliderLabel);
+        hboxCheckBox1.getChildren().addAll(letters, spacer2, numbers);
+        hboxCheckBox2.getChildren().addAll(capitals, spacer3, special);
+        vbox.getChildren().addAll(hboxLabel, slider, hboxCheckBox1, hboxCheckBox2, b1);
         vbox.setAlignment(Pos.valueOf(position.toUpperCase()));
         return vbox;
     }
