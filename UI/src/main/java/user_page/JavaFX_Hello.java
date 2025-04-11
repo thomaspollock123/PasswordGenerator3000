@@ -16,9 +16,13 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import utility.PassGen;
+
+import java.util.List;
+import java.util.Optional;
 
 public class JavaFX_Hello extends Application {
 
@@ -26,11 +30,13 @@ public class JavaFX_Hello extends Application {
     PassGen pg = new PassGen();
     PasswordObject passwordObject = new PasswordObject();
     private final ObservableList<PasswordObject> passwordData = FXCollections.observableArrayList();
+    Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid Input.");
+    Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
 
     @Override
     public void start(Stage stage) {
         try {
-            stage.setTitle("This is a Test VBox");
+            stage.setTitle("PasswordGenerator3000");
 
             // Create VBox for each corner
             Pair<VBox, TextField> topPair = createPasswordInput(10, "TOP_LEFT", "Password Input", "Search", "Insert", "Delete", "Update");
@@ -85,6 +91,13 @@ public class JavaFX_Hello extends Application {
         Button b4 = new Button(but4);
         TextField t1 = new TextField();
         TextField t2 = new TextField();
+        confirmation.setTitle("Confirm Action.");
+        confirmation.setHeaderText("Are you sure?");
+        confirmation.setContentText("Do you want to proceed?");
+        ButtonType yesButton = new ButtonType("Yes", ButtonBar.ButtonData.YES);
+        ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
+        confirmation.getButtonTypes().setAll(yesButton, noButton);
+
         t1.setPromptText("Enter Name");
         t2.setPromptText("Enter Password");
         hbox.getChildren().addAll(b1, b2, b3, b4);
@@ -97,8 +110,16 @@ public class JavaFX_Hello extends Application {
                 t1.clear();
                 t2.clear();
                 if (!owner.isEmpty()) {
+                    List<PasswordObject> results = crud.SearchPassword(owner);
+                    if (results != null && !results.isEmpty()) {
+                        passwordData.setAll(results);
+                    } else {
+                        alert.showAndWait();
+                        passwordData.setAll(crud.getAllPasswords());
+                    }
                     passwordData.setAll(crud.SearchPassword(owner));
                 } else {
+                    alert.showAndWait();
                     passwordData.setAll(crud.getAllPasswords());
                 }
             }
@@ -113,6 +134,8 @@ public class JavaFX_Hello extends Application {
                     t1.clear();
                     t2.clear();
                     passwordData.setAll(crud.getAllPasswords());
+                } else {
+                    alert.showAndWait();
                 }
             }
         });
@@ -123,9 +146,14 @@ public class JavaFX_Hello extends Application {
                 t1.clear();
                 t2.clear();
                 if (!owner.isEmpty()) {
-                    crud.DeletePassword(owner);
-                    passwordData.setAll(crud.getAllPasswords());
-                };
+                    Optional<ButtonType> result = confirmation.showAndWait();
+                    if (result.isPresent() && result.get() == yesButton) {
+                        crud.DeletePassword(owner);
+                        passwordData.setAll(crud.getAllPasswords());
+                    }
+                } else {
+                    alert.showAndWait();
+                }
             }
         });
         b4.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
@@ -134,10 +162,15 @@ public class JavaFX_Hello extends Application {
                 String owner = t1.getText();
                 String password = t2.getText();
                 if (!owner.isEmpty() && !password.isEmpty()) {
-                    crud.UpdatePassword(owner, password);
-                    t1.clear();
-                    t2.clear();
-                    passwordData.setAll(crud.getAllPasswords());
+                    Optional<ButtonType> result = confirmation.showAndWait();
+                    if (result.isPresent() && result.get() == yesButton) {
+                        crud.UpdatePassword(owner, password);
+                        t1.clear();
+                        t2.clear();
+                        passwordData.setAll(crud.getAllPasswords());
+                    }
+                } else {
+                    alert.showAndWait();
                 }
             }
         });
